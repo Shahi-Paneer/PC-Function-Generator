@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
+#include <cstdint>
 
 using namespace std;
 
@@ -116,39 +117,28 @@ vector<double> generateSamples(double freq, double amp, int rate, int numSamples
     vector<double> wave;
     wave.reserve(numSamples);
 
-    switch (option)
+    for (int n = 0; n < numSamples; n++)
     {
-    case 1:
-        for (int n = 0; n < numSamples; n++)
-        {
-            double time = static_cast<double>(n) / rate;
-            wave.push_back(sineWave(freq, amp, time));
-        }
-        break;
-    case 2:
-        for (int n = 0; n < numSamples; n++)
-        {
-            double time = static_cast<double>(n) / rate;
-            wave.push_back(squareWave(freq, amp, time));
-        }
-        break;
-    case 3:
-        for (int n = 0; n < numSamples; n++)
-        {
-            double time = static_cast<double>(n) / rate;
-            wave.push_back(triangleWave(freq, amp, time));
-        }
-        break;
-    case 4:
-        for (int n = 0; n < numSamples; n++)
-        {
-            double time = static_cast<double>(n) / rate;
-            wave.push_back(sawtoothWave(freq, amp, time));
-        }
-        break;
+        double time = static_cast<double>(n) / rate;
+        wave.push_back(sineWave(freq, amp, time));
 
-    default:
-        break;
+        switch (option)
+        {
+        case 1:
+            wave.push_back(sineWave(freq, amp, time));
+            break;
+        case 2:
+            wave.push_back(squareWave(freq, amp, time));
+            break;
+        case 3:
+            wave.push_back(triangleWave(freq, amp, time));
+            break;
+        case 4:
+            wave.push_back(sawtoothWave(freq, amp, time));
+            break;
+        default:
+            break;
+        }
     }
 
     return wave;
