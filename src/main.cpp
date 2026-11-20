@@ -20,7 +20,9 @@ double calculatePhase(double freq, double time);
 
 vector<double> generateSamples(double freq, double amp, int rate, int numSamples, int option);
 
-void exportCSV(const vector<double> &samples, int rate);
+vector<int16_t> encodePCM(const vector<double> &samples);
+
+void exportCSV(const vector<double> &samples, const vector<int16_t> &pcmSamples, int rate);
 
 int main()
 {
@@ -60,7 +62,9 @@ int main()
 
     vector<double> wave = generateSamples(freq, amp, rate, numSamples, option);
 
-    exportCSV(wave, rate);
+    vector<int16_t> pcmWave = encodePCM(wave);
+
+    exportCSV(wave, pcmWave, rate);
 
     return 0;
 }
@@ -120,7 +124,6 @@ vector<double> generateSamples(double freq, double amp, int rate, int numSamples
     for (int n = 0; n < numSamples; n++)
     {
         double time = static_cast<double>(n) / rate;
-        wave.push_back(sineWave(freq, amp, time));
 
         switch (option)
         {
@@ -144,18 +147,34 @@ vector<double> generateSamples(double freq, double amp, int rate, int numSamples
     return wave;
 }
 
-void exportCSV(const vector<double> &samples, int rate)
+void exportCSV(const vector<double> &samples, const vector<int16_t> &pcmSamples, int rate)
 {
     ofstream file("waveform.csv");
 
-    file << "Time,Amplitude\n";
+    file << "Time,Amplitude,PCM\n";
 
     for (size_t n = 0; n < samples.size(); n++)
     {
         double time = static_cast<double>(n) / rate;
 
-        file << time << "," << samples[n] << "\n";
+        file << time << "," << samples[n] << "," << pcmSamples[n] << "\n";
     }
 
     file.close();
+}
+
+vector<int16_t> encodePCM(const vector<double> &samples)
+{
+    vector<int16_t> pcmWave;
+    pcmWave.reserve(samples.size());
+
+    for (double sample : samples)
+    {
+        int16_t pcm = static_cast<int16_t>(
+            round(sample * 32767));
+
+        pcmWave.push_back(pcm);
+    }
+
+    return pcmWave;
 }
